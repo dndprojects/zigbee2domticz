@@ -59,7 +59,7 @@ def on_message(client, userdata, msg):
        result = "bad"
     if  "SENSOR" in server_topic:
         mpayload = json.loads(server_msg,strict=False)
-        print(mpayload)
+        #print(mpayload)
         if "ZbReceived" in mpayload:
             linkQuality=0
             try:
@@ -70,8 +70,11 @@ def on_message(client, userdata, msg):
                 device_name = all['Name']+","+str(all['Endpoint'])
                 idx = domoticz_dict[device_name]
                 power_id = 'Power'
-                if zigbee_power_id_dict[str(idx)] is not None:
-                   power_id = zigbee_power_id_dict[str(idx)]
+                try:
+                   if zigbee_power_id_dict[str(idx)] is not None:
+                      power_id = zigbee_power_id_dict[str(idx)]
+                except Exception:
+                   pass
                 if re.match("temperature", device_name):
                    url = "http://" + mqtt_server_ip_port + '/json.htm?type=devices&rid='+str(idx)
                    response = requests.get(url)
@@ -94,14 +97,20 @@ def on_message(client, userdata, msg):
                        pass
                    mqtt_domo_publish_temperature(idx,temperature,humidity,battery)
                    return
-                power_status = str(all[power_id])
-                #print(device_name+":"+power_status)
-                url = "http://" + mqtt_server_ip_port + '/json.htm?type=command&param=udevice&idx=' + str(idx) + '&nvalue=' + power_status + '&svalue='  
-                data = requests.get(url).json
-                mqtt_domo_publish(idx,all,power_status)
-                #print(url)
-                #dimmner control
-                #using 2 way switch as one 
+                power_status = "unknown"
+                try:
+                   power_status = str(all[power_id])
+                except Exception:
+                   pass
+                if power_status != "unknown":
+                    power_status = str(all[power_id])
+                    #print(device_name+":"+power_status)
+                    url = "http://" + mqtt_server_ip_port + '/json.htm?type=command&param=udevice&idx=' + str(idx) + '&nvalue=' + power_status + '&svalue='  
+                    data = requests.get(url).json
+                    mqtt_domo_publish(idx,all,power_status)
+                    #print(url)
+                    #dimmner control
+                    #using 2 way switch as one 
                 if str(idx) == "410":
                    if check_domo_device_status(str(idx)) == "On":               
                       url = "http://" + mqtt_server_ip_port + '/json.htm?type=command&param=switchlight&idx=' + str(idx) + '&switchcmd=Off'
