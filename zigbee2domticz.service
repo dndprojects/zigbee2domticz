@@ -1,0 +1,15 @@
+[Unit]
+Description=zigbee2domticz
+After=network.target domoticz.service
+
+[Service]
+Type=simple
+User=http
+Group=http
+ExecStart=/opt/zigbee2domticz/zigbee2domticz.py
+WorkingDirectory=/opt/zigbee2domticz
+RestartSec=15
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
