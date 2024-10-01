@@ -76,7 +76,7 @@ def on_message(client, userdata, msg):
                 except Exception:
                    pass
                 if re.match("temperature", device_name):
-                   url = "http://" + mqtt_server_ip_port + '/json.htm?type=devices&rid='+str(idx)
+                   url = "http://" + mqtt_server_ip_port + '/json.htm?type=command&param=getdevices&rid='+str(idx)
                    response = requests.get(url)
                    data = response.json()
                    temperature = str(data['result'][0]['Temp'])
@@ -123,7 +123,8 @@ def on_message(client, userdata, msg):
                print(e)
                 
 def check_domo_device_status(idx):
-    url = "http://" + mqtt_server_ip_port + '/json.htm?type=devices&rid='+idx
+    #json.htm?type=command&param=getdevices&rid=411
+    url = "http://" + mqtt_server_ip_port + '/json.htm?type=command&param=getdevices&rid='+idx
     response = urlopen(url)
     data = json.loads(response.read().decode('utf-8'))
     return (data['result'][0]['Status'])
@@ -190,4 +191,3 @@ update_thread = threading.Thread(target=update_device_status, args=(domoticz_dic
 update_thread.start()
 print("start_loop")
 client.loop_forever()
-
