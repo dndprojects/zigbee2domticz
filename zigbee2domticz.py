@@ -140,7 +140,7 @@ def mqtt_domo_publish(deviceIDX,msg_json,power_status):
 def mqtt_domo_publish_temperature(deviceIDX,temperature,humidity,battery):
     #mosquitto_pub -h 192.168.1.3 -t domoticz/in  -m '{ "idx" : 411,"nvalue" : 0,"svalue" : "21;35;1"}'
     topic='domoticz/in'
-    hum_status = determine_humidity_status(int(humidity))
+    hum_status = determine_humidity_status(real(humidity))
     sval=temperature+ ";" + humidity + ";"+str(hum_status)
     publish_data = {'idx':int(deviceIDX), 'nvalue':0, 'svalue':sval, 'Battery':int(battery)}
     #print(json.dumps(publish_data))
